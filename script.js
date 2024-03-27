@@ -1,6 +1,135 @@
 "use strict";
-
+const section1 = document.querySelector(`#section--1`);
 ///////////////////////////////////////
+/////////////// STICKY NAVIGATION: INTERSECTION OBSERVER API  ///////////
+// const obsCallback = function (entries, observer) {
+//   entries.forEach((entry) => {
+//     console.log(entry);
+//   });
+// };
+
+// const obsOptions = {
+//   root: null,
+//   threshold: [0, 0.2],
+// };
+
+// const observer = new IntersectionObserver(obsCallback, obsOptions);
+// observer.observe(section1);
+
+const header = document.querySelector(`.header`);
+// const navHeight = nav.getBoundingClientRect().height;
+
+const stickyNav = function (entries) {
+  const [entry] = entries;
+  console.log(entry);
+  if (!entry.isIntersecting) nav.classList.add(`sticky`);
+  else nav.classList.remove(`sticky`);
+};
+
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null,
+  threshold: 0,
+  rootMargin: `-1000px`,
+});
+headerObserver.observe(header);
+
+///////////////// REVEAL SECTIONS: INTERSECTION OBSERVER API  ///////////
+const allSections = document.querySelectorAll(`.section`);
+const revealSection = function (entries, observer) {
+  const [entry] = entries;
+  // console.log(entry);
+  if (!entry.isIntersecting) return;
+
+  entry.target.classList.remove(`section--hidden`);
+  observer.unobserve(entry.target);
+};
+
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+allSections.forEach(function (section) {
+  sectionObserver.observe(section);
+  // section.classList.add(`section--hidden`);
+});
+
+/////////////// LAZY LOADING IMAGES: INTERSECTION OBSERVER API  ////////
+const imgTarget = document.querySelectorAll(`img[data-src]`);
+console.log(imgTarget);
+
+const loadImg = function (entries, observer) {
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+  //REPLACE src with data.src
+  entry.target.src = entry.target.dataset.src;
+
+  entry.target.addEventListener(`load`, function () {
+    entry.target.classList.remove(`lazy-img`);
+  });
+
+  observer.unobserve(entry.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0,
+  rootMargin: `200px`,
+});
+
+imgTarget.forEach((img) => imgObserver.observe(img));
+//////////////////////// SLIDER COMPONENT //////////////////////////
+const slides = document.querySelectorAll(`.slide`);
+const btnLeft = document.querySelector(`.slider__btn--left`);
+const btnRight = document.querySelector(`.slider__btn--right`);
+
+let currentSlide = 0;
+const maxSlide = slides.length;
+
+// const slider = document.querySelector(`.slider`);
+// slider.style.transform = `scale(0.4) translateX(-300px)`;
+// slider.style.overflow = `visible`;
+
+const goToSlide = function (slide) {
+  slides.forEach(
+    (s, i) => (s.style.transform = `translateX(${100 * (i - slide)}%)`)
+  );
+};
+goToSlide(0);
+
+// Next slide
+const nextSlide = function () {
+  if (currentSlide === maxSlide - 1) {
+    currentSlide = 0;
+  } else {
+    currentSlide++;
+  }
+
+  goToSlide(currentSlide);
+};
+
+const prevSlide = function () {
+  if (currentSlide === 0) {
+    currentSlide = maxSlide - 1;
+  } else {
+    currentSlide--;
+  }
+  goToSlide(currentSlide);
+};
+
+btnRight.addEventListener(`click`, nextSlide);
+btnLeft.addEventListener(`click`, prevSlide);
+
+///////////////// STICKY NAVIGATION: WRONG WAY  /////////////////////////
+
+// const initialCoords = section1.getBoundingClientRect();
+// window.addEventListener(`scroll`, function () {
+//   console.log(window.scrollY);
+
+//   if (window.scrollY > initialCoords.top) {
+//     nav.classList.add(`sticky`);
+//   } else nav.classList.remove(`sticky`);
+// });
 
 //////////////////////// MODAL WINDOW //////////////////////////
 const modal = document.querySelector(".modal");
@@ -99,7 +228,6 @@ tabsContainer.addEventListener(`click`, function (e) {
 });
 
 ///////////////// MENU FADE ANIMATION  /////////////////////////////
-
 const handleHover = function (e, opacity) {
   if (e.target.classList.contains(`nav__link`)) {
     const link = e.target;
@@ -192,8 +320,8 @@ console.log(document.documentElement);
 console.log(document.head);
 console.log(document.body);
 
-const header = document.querySelector(`.header`);
-const allSections = document.querySelectorAll(`.section`);
+// const header = document.querySelector(`.header`);
+// const allSections = document.querySelectorAll(`.section`);
 console.log(allSections);
 
 document.getElementById(`section--1`);
@@ -204,10 +332,10 @@ console.log(document.getElementsByClassName(`btn`));
 
 /////////////////////////// CREATING AND INSERTING ELEMENTS ////////////
 //.insertAdjacentHTML
-const message = document.createElement(`div`);
-message.classList.add(`cookie-message`);
-message.textContent = `We use cookies for improved functionaity and analytics.`;
-message.innerHTML = `We use cookies for improved functionaity and analytics.<button class="btn btn--close-cookie"> Got it!</button>`;
+// const message = document.createElement(`div`);
+// message.classList.add(`cookie-message`);
+// message.textContent = `We use cookies for improved functionaity and analytics.`;
+// message.innerHTML = `We use cookies for improved functionaity and analytics.<button class="btn btn--close-cookie"> Got it!</button>`;
 
 // header.prepend(message);
 header.append(message);
